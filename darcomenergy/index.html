@@ -556,13 +556,13 @@
 
   /* ---------- monthly breakdown ---------- */
   .month-sort { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .month-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
-  @media (max-width: 860px) {
-    .month-list { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .month-list { grid-template-columns: 1fr; }
-  }
+  /* auto-fit (not a fixed repeat(3) + viewport breakpoints) so the column
+     count tracks the card's actual rendered width - this card now shares a
+     row with Channel benchmarks, so it's roughly half as wide as a
+     viewport-based breakpoint would assume, and it's also reused at full
+     card width inside the "Show all" popup. A fixed column count sized for
+     one context wrapped month labels awkwardly in the other. */
+  .month-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 12px; margin-top: 14px; }
   .month-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; align-self: start; }
   .month-row summary {
     list-style: none;
@@ -579,7 +579,7 @@
   .month-summary-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .month-caret { color: var(--muted); font-size: 11px; transition: transform 0.12s ease; flex: none; }
   .month-row[open] .month-caret { transform: rotate(90deg); }
-  .month-label { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; }
+  .month-label { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .month-mix { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
   .month-count { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
   .month-total { font-family: var(--font-mono); font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; flex: none; }
@@ -1062,7 +1062,7 @@
   <header class="masthead">
     <div class="masthead-left">
       <div class="wordmark">Social Media Analytics</div>
-      <div class="client-name">Darcom Energy</div>
+      <div class="client-name">DARCOM ENERGY</div>
       <div class="slate-line">
         <span><span class="rec-dot"></span><b>Live</b> — refreshed daily</span>
         <span id="asOfLine">as of —</span>
@@ -1116,6 +1116,31 @@
     <section class="card">
       <div class="card-head">
         <div class="card-head-text">
+          <div class="card-title">Latest reels</div>
+          <div class="card-note" id="latestNote">Most recent shorts posted</div>
+        </div>
+        <button class="show-more-btn" id="latestShowAll" type="button">Show all</button>
+      </div>
+      <div class="filterbar sub" id="latestFilterbar" role="group" aria-label="Latest reels date range">
+        <span class="flabel">Range</span>
+        <button class="chip" data-range="all" type="button" aria-pressed="true">All time</button>
+        <button class="chip" data-range="year-current" type="button" aria-pressed="false">Current year</button>
+        <button class="chip" data-range="year-last" type="button" aria-pressed="false">Last completed year</button>
+        <button class="chip" data-range="365" type="button" aria-pressed="false">Last year</button>
+        <button class="chip" data-range="month-current" type="button" aria-pressed="false">Current month</button>
+        <button class="chip" data-range="month-last" type="button" aria-pressed="false">Last completed month</button>
+        <button class="chip" data-range="30" type="button" aria-pressed="false">Last 30 days</button>
+        <button class="chip" data-range="90" type="button" aria-pressed="false">Last 90 days</button>
+        <input class="date-input" id="latestRangeFrom" type="date" aria-label="Latest reels custom range: from date" />
+        <span class="date-sep">–</span>
+        <input class="date-input" id="latestRangeTo" type="date" aria-label="Latest reels custom range: to date" />
+      </div>
+      <div class="perf-grid" id="latestList"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div class="card-head-text">
           <div class="card-title">Top performers</div>
           <div class="card-note" id="rankNote">Ranked by total views</div>
         </div>
@@ -1137,31 +1162,6 @@
       </div>
       <div class="perf-filters" id="perfFilters" role="group" aria-label="Filter by platform"></div>
       <div class="perf-grid" id="rankList"></div>
-    </section>
-
-    <section class="card">
-      <div class="card-head">
-        <div class="card-head-text">
-          <div class="card-title">Latest reels</div>
-          <div class="card-note" id="latestNote">Most recent shorts posted</div>
-        </div>
-        <button class="show-more-btn" id="latestShowAll" type="button">Show all</button>
-      </div>
-      <div class="filterbar sub" id="latestFilterbar" role="group" aria-label="Latest reels date range">
-        <span class="flabel">Range</span>
-        <button class="chip" data-range="all" type="button" aria-pressed="true">All time</button>
-        <button class="chip" data-range="year-current" type="button" aria-pressed="false">Current year</button>
-        <button class="chip" data-range="year-last" type="button" aria-pressed="false">Last completed year</button>
-        <button class="chip" data-range="365" type="button" aria-pressed="false">Last year</button>
-        <button class="chip" data-range="month-current" type="button" aria-pressed="false">Current month</button>
-        <button class="chip" data-range="month-last" type="button" aria-pressed="false">Last completed month</button>
-        <button class="chip" data-range="30" type="button" aria-pressed="false">Last 30 days</button>
-        <button class="chip" data-range="90" type="button" aria-pressed="false">Last 90 days</button>
-        <input class="date-input" id="latestRangeFrom" type="date" aria-label="Latest reels custom range: from date" />
-        <span class="date-sep">–</span>
-        <input class="date-input" id="latestRangeTo" type="date" aria-label="Latest reels custom range: to date" />
-      </div>
-      <div class="perf-grid" id="latestList"></div>
     </section>
   </div>
 
@@ -1238,7 +1238,7 @@
 
   <footer>
     <span>Social Media Analytics — a recurring performance report. Data synced automatically from production tracking; nothing here is entered by hand.</span>
-    <span>Prepared for Darcom Energy</span>
+    <span>Prepared for DARCOM ENERGY</span>
   </footer>
 
 </div>
@@ -1294,7 +1294,7 @@
   // "link" is already resolved server-side to the best available platform
   // URL (Instagram preferred, falling back to YouTube/Facebook/TikTok) -
   // see fetchDashboardRows in src/dashboard.js.
-  var RAW = [];
+  var RAW = [["⚡️ Energia nu este o utilitate, ci fundamentul care susține ambiția de a…","",null,9421,586,null,"2026-02-24","https://www.instagram.com/reel/DVJb5FaDWld/",null,null],["Energia ta nu trebuie să fie o variabilă neprevăzută. ⚡","",null,15277,661,null,"2026-02-26","https://www.instagram.com/reel/DVQTTWRDfaP/",null,null],["Dincolo de ecran: Expertiza tehnică devine dialog direct la Romexpo 🤝","",null,36316,661,null,"2026-02-27","https://www.instagram.com/reel/DVQTTWRDfaP/",null,null],["În business, timpul se măsoară în randament, iar energia în independență.","",null,7026,636,null,"2026-03-01","https://www.instagram.com/reel/DVYBr_kkv6u/",null,null],["Trei drumuri. O singură destinație: Autonomia energetică totală ⚡","",null,1184,636,null,"2026-03-02","https://www.instagram.com/reel/DVYBr_kkv6u/",null,null],["Eficiența energetică: De la strategie la implementare.","",null,556,412,null,"2026-03-04","https://www.instagram.com/reel/DVdLULYjQOd/",null,null],["Valoarea reală a unei soluții nu este demonstrată în momentul finalizării…","",null,1158,null,null,"2026-03-16","https://www.facebook.com/reel/2000692560486622/",null,null],["🥇 Controlul energiei devine un nou standard de performanță în business.","",null,3327,303,null,"2026-03-23","https://www.instagram.com/reel/DWPW81EAB8k/",null,null],["🏗️ Adevăratul test al unei infrastructuri energetice este anduranta","",null,776,440,null,"2026-03-24","https://www.instagram.com/reel/DWRiGSrhwQH/",null,null],["⚡️ Pentru cei care aleg viața în mișcare, energia nu este un detaliu. Este baza…","",null,521,229,null,"2026-03-25","https://www.instagram.com/reel/DWUG5JJhfyx/",null,null],["🤝 Adevărata măsură a unui parteneriat nu stă în cuvinte bine alese, ci în…","",null,4414,294,null,"2026-03-26","https://www.instagram.com/reel/DWWrvGJhUDh/",null,null],["Valoarea reală a unei soluții nu este demonstrată în momentul finalizării…","",null,5080,286,null,"2026-03-28","https://www.instagram.com/reel/DWb0kVCCDQr/",null,null],["🔆 Instalarea panourilor fotovoltaice fără o planificare tehnică riguroasă…","",null,291701,320,null,"2026-03-31","https://www.instagram.com/reel/DWjebweCIAF/",null,null],["One Stop Partner nu este un slogan. Este modul în care lucrăm, zi de zi.","",373,1279,295,null,"2026-04-02","https://www.instagram.com/reel/DWomZ13ht3B/",null,null],["Investiția într-un sistem fotovoltaic începe și cu finanțarea potrivită","",733,392,412,null,"2026-04-03","https://www.instagram.com/reel/DWrLLGZoIC5/",null,null],["Nu există o soluție universală. Există soluția potrivită.","",434,1452,445,null,"2026-04-05","https://www.instagram.com/reel/DWwWaxvCJQQ/",null,null],["În spatele fiecărui sistem există mai mult decât echipamente.","",58,8705,345,null,"2026-04-07","https://www.instagram.com/reel/DW1eZxIhM9r/",null,null],["Reducerea costurilor nu vine din instalare. Vine din cum functioneaza sistemul.","",311,1302,270,null,"2026-04-09","https://www.instagram.com/reel/DW6iRnPiA9m/",null,null],["În zona comercială și industrială, energia nu mai este doar un cost","",392,1410,321,null,"2026-04-11","https://www.instagram.com/reel/DW_zp46iI8Y/",null,null],["Majoritatea companiilor nu au o problema de energie. Au o problema de control.","",288,6664,425,null,"2026-04-14","https://www.instagram.com/reel/DXHgRwBiPva/",null,null],["În C&I, performanța nu se oprește la punerea în funcțiune.","",721,4983,324,null,"2026-04-15","https://www.instagram.com/reel/DXKEsErB8rg/",null,null],["Nu orice sistem produce energie. Unele susțin un business.","",288,1031,282,null,"2026-04-16","https://www.instagram.com/reel/DXMpkwgh55m/",null,null],["Un proiect bun nu începe cu echipamentele. Începe cu întrebările corecte.","",291,766,398,null,"2026-04-17","https://www.instagram.com/reel/DXPOuXLiD-q/",null,null],["Daca nu pleci de la consumul real, sistemul nu o sa livreze ce astepti.","",111,861,400,null,"2026-04-18","https://www.instagram.com/reel/DXRl6naiMWu/",null,null],["Fara integrare intre fotovoltaic, stocare si management, pierzi controlul","",394,889,296,null,"2026-04-19","https://www.instagram.com/reel/DXUjdFbjeUV/",null,null],["Energia produsă nu înseamnă control. Stocarea, da.","",254,668,258,null,"2026-04-23","https://www.instagram.com/reel/DXerydMiPJL/",null,null],["Blackout period-ul este una dintre cele mai  ignorate surse de pierdere financiară pentru o afacere","",45,377,304,null,"2026-04-24","https://www.instagram.com/reel/DXhV3m8iNYO/",null,null],["Ce poti face pentru afacerea ta cand pica reteaua?","",202,907,259,null,"2026-04-25","https://www.instagram.com/reel/DXj6IvgiHcM/",null,null],["Funcționalitate sau performanță?","",null,30586,250,null,"2026-04-26","https://www.instagram.com/reel/DXmfM7wCBNU/",null,null],["Pentru unele business-uri, energia nu este un cost. Este o condiție de funcționare.","",363,868,243,null,"2026-04-27","https://www.instagram.com/reel/DXpMU9VjZn0/",null,null],["La GREEN ENERGY EXPO, Darcom Energy a urcat pe scenă pentru a educa.","",319,940,480,null,"2026-04-29","https://www.instagram.com/reel/DXuGzR7oqbM/",null,null],["Energia nu arată la fel pentru toată lumea.","",173,721,308,null,"2026-04-30","https://www.instagram.com/reel/DXwsnk2oujE/",null,null],["Darcom Energy a fost prezent la GREEN ENERGY EXPO cu un singur obiectiv: să ridice standardul. 🔝","",60,553,293,null,"2026-05-02","https://www.instagram.com/reel/DX15DfPIn9d/",null,null],["Reduci costurile. Nu complexitatea.","",199,1613,295,null,"2026-05-03","https://www.instagram.com/reel/DX4rA-9gKqY/",null,null],["Încrederea se construiește în timp.","",202,723,210,null,"2026-05-07","https://www.instagram.com/reel/DYCqzxUK_-H/",null,null],["Energia nu mai poate fi lăsată la voia întâmplării.","",119,483,394,null,"2026-05-08","https://www.instagram.com/reel/DYFdstPKbdn/",null,null],["Un sistem fotovoltaic nu devine performant la instalare. Devine în timp.","",168,844,270,null,"2026-05-09","https://www.instagram.com/reel/DYH55SMKwfE/",null,null],["Peste 30 de ani de experiență antreprenorială si 15 ani de fotovoltaic","",null,525,261,null,"2026-05-11","https://www.instagram.com/reel/DYNQUtkAkaa/",null,null],["La Darcom Energy  proiectăm pentru prezent, dar dimensionăm pentru viitor!","",424,1048,490,null,"2026-05-15","https://www.instagram.com/reel/DYXi4Nigmdm/",null,null],["Un sistem rezidențial corect înseamnă mai mult decât panouri pe acoperiș.","",568,1600,409,null,"2026-05-16","https://www.instagram.com/reel/DYaAdzYqHT6/",null,null],["Ai un proiect fotovoltaic în plan?","",212,2346,273,null,"2026-05-17","https://www.instagram.com/reel/DYctVFuA1Gp/",null,null],["Înainte de primul panou instalat, trebuie să știi exact ce construiești.","",273,1021,296,null,"2026-05-19","https://www.instagram.com/reel/DYh0f5NA51E/",null,null],["Când un om îți încredințează atât locuința, cât și afacerea, responsabilitatea e dublă...","",148,2420,408,null,"2026-05-22","https://www.instagram.com/reel/DYpaDy0qgOX/",null,null],["Un festival întreg. Zero combustibil fosil.","",541,null,883,null,"2026-05-28","https://www.instagram.com/reel/DY49xFegg_N/",null,null],["Ce a căutat Darcom Energy la BSDA?","",159,2956,472,null,"2026-06-04","https://www.instagram.com/reel/DZK6KAEquQv/",null,null],["Generatorul hibrid schimbă complet logica clasică de alimentare.","",269,2956,681,null,"2026-06-05","https://www.instagram.com/reel/DZNnVYbjQIz/",null,null],["Project management-ul în energie nu înseamnă doar coordonare.","",243,null,362,null,"2026-06-06","https://www.instagram.com/reel/DZPuuvoACdl/",null,null],["Aici intervine energia portabilă. Nu ca backup, ci ca intervenție.","",455,3602,369,null,"2026-06-07","https://www.instagram.com/reel/DZSiD9WAIv2/",null,null],["Un proiect energetic de anvergură are nevoie de o arhitectură coerentă. ☀️","",103,1434,223,null,"2026-06-08","https://www.instagram.com/reel/DZVORk5DVrT/",null,null],["Containerul de stocare și management inteligent al energiei este nivelul următor.","",302,2382,401,null,"2026-06-09","https://www.instagram.com/reel/DZXzTVtAHoI/",null,null],["Sistem containerizat de stocare a energiei","",128,1772,1390,null,"2026-06-10","https://www.instagram.com/reel/DZadh2qgPyW/",null,null],["Ai un proiect de peste 3MW?","",218,1689,475,null,"2026-06-12","https://www.instagram.com/reel/DZfs3LdAgrW/",null,null],["🎥 Poate un camion să fie, în același timp, locuință, centru de comandă și sursă de energie?","",133,5973,772,null,"2026-06-18","https://www.instagram.com/reel/DZuxEi4ICJ3/",null,null],["🎥 O remorcă off-road poate deveni infrastructură energetică mobilă.","",279,2914,772,null,"2026-06-19","https://www.instagram.com/reel/DZuxEi4ICJ3/",null,null],["114,6 kWp pentru business: energia care a devenit avantaj competitiv | Solo Caffe","",67,2914,592,null,"2026-06-19","https://www.instagram.com/reel/DZxiH9bgQ5R/",null,null],["De ce a ales să își extindă sistemul fotovoltaic după instalare?","",198,null,null,null,"2026-06-21","https://www.youtube.com/watch?v=_X60Nx5-248",null,null],["Valrom: peste 1,6 MWp instalați, 2 GWh produși anual și amortizare în 3-4 ani","",190,null,null,null,"2026-06-21","https://www.youtube.com/watch?v=53Zl4jkLPEg",null,null],["(untitled Facebook Reel)","",null,null,null,null,"2026-07-15","https://www.facebook.com/reel/2583081552121152/",null,null],["(untitled Facebook Reel)","",null,null,null,null,"2026-07-15","https://www.facebook.com/reel/4100655013400094/",null,null],["Cum transformi o idee într-un sistem energetic funcțional?","",536,3026,608,null,"2026-07-17","https://www.instagram.com/reel/Da5rP_ZAmeQ/",null,null],["🏡 Ce face, de fapt, o locuință eficientă?","",133,1304,551,null,"2026-07-18","https://www.instagram.com/reel/Da7jpfegPwl/",null,null],["⚡ Rețeaua cade. Sistemul continuă.","",995,3136,472,null,"2026-07-19","https://www.instagram.com/reel/Da-xL7GMgb8/",null,null],["Unele proiecte nu pot aștepta infrastructura.","",386,4285,535,null,"2026-07-21","https://www.instagram.com/reel/DbDHXXVgEBV/",null,null],["În energie, experiența practică face diferența.","",1272,5477,460,null,"2026-07-22","https://www.instagram.com/reel/DbGlF7LAVsS/",null,null],["Nu este suficient să produci energie. Trebuie să o poți folosi când contează.","",743,2066,365,null,"2026-07-24","https://www.instagram.com/reel/DbLUU_0Axlo/",null,null],["Un microgrid performant nu înseamnă doar echipamente performante.","",257,2292,579,null,"2026-07-27","https://www.instagram.com/reel/DbSlkYVg8oF/",null,null],["Reciclarea poate fi explicată și altfel. Iar asta face diferența.","",257,979,390,null,"2026-07-28","https://www.instagram.com/reel/DbWGg7WgZjH/",null,null],["Pentru noi, CamperVan Fest nu este doar un eveniment.","",1660,922,485,null,"2026-07-30","https://www.instagram.com/reel/DbbDssOlUpi/",null,null],["Performanța unui sistem se decide înainte ca primul echipament să fie instalat.","",1236,2933,498,null,"2026-08-01","https://www.instagram.com/reel/DbgPvoeqlDs/",null,null],["Mentenanță profesională sistem fotovoltaic industrial","",99,2933,328,null,"2026-08-01","https://www.instagram.com/reel/Dbc_H1dgWZQ/",null,null],["Săptămâna aceasta nu a fost doar despre montaj.","",147,1308,498,null,"2026-08-02","https://www.instagram.com/reel/DbgPvoeqlDs/",null,null],["Workshop Darcom Energy | Practică, tehnică și soluții aplicate","",131,1388,568,null,"2026-08-03","https://www.instagram.com/reel/DblNLJikixw/",null,null],["🚐 Când infrastructura nu este permanentă, energia trebuie să fie pregătită să se adapteze.","",943,1388,568,null,"2026-08-03","https://www.instagram.com/reel/DblNLJikixw/",null,null],["Revizie sistem fotovoltaic – Darcom Energy","",157,1388,406,null,"2026-08-03","https://www.instagram.com/reel/Dbi3iR8AdwR/",null,null],["Soluții mobile de energie la Festivalul Outdoorz | Darcom Energy","",65,1388,568,null,"2026-08-04","https://www.instagram.com/reel/DblNLJikixw/",null,null],["Nu începe pe câmp. Începe aici. Culisele unui proiect de microgrid","",375,1407,469,null,"2026-08-06","https://www.instagram.com/reel/DbtIbm5gmWg/",null,null],["Tunnel Mist: Când energia devine experiență","",1633,1329,373,null,"2026-08-08","https://www.instagram.com/reel/DbxTTj8gOp9/",null,null],["Două rulote. Două configurații energetice. O singură idee: soluția potrivită.","",1464,1390,373,null,"2026-08-09","https://www.instagram.com/reel/DbxTTj8gOp9/",null,null],["Cum este gestionată energia produsă de panourile fotovoltaice?","",481,1107,495,null,"2026-08-10","https://www.instagram.com/reel/Db0lUaMgJzV/",null,null],["Un sistem bun îți oferă energie. Un sistem bine gândit îți oferă liniște.","",1604,1154,423,null,"2026-08-11","https://www.instagram.com/reel/Db3lGEggXGw/",null,null],["Energia devine cu adevărat valoroasă atunci când poate ajunge oriunde este nevoie de ea.","",492,991,314,null,"2026-08-12","https://www.instagram.com/reel/Db5xcF2glSg/",null,null],["Poți alege aceleași echipamente. Nu și aceeași experiență.","",85,2219,494,null,"2026-08-13","https://www.instagram.com/reel/Db8SkEdCngC/",null,null],["Ce e diferit la proiectul ăsta?","",770,2219,551,null,"2026-08-14","https://www.instagram.com/reel/DcBorOVlCbQ/",null,null],["De la proiecte reale la următorul proprietar | Platformă energetică mobilă","",367,2916,566,null,"2026-08-17","https://www.instagram.com/reel/DcJB7Gomt4o/",null,null],["Energie produsă. Energie stocată. Energie folosită inteligent.","",190,1717,361,null,"2026-08-18","https://www.instagram.com/reel/DcMCs1vmalu/",null,null],["Finanțarea este importantă. Dar pregătirea tehnică poate face diferența","",8,113,90,null,"2026-08-19","https://www.instagram.com/reel/DcOVGG6gQSC/",null,null],["Programul de stocare se apropie. Acum este momentul să te pregătești.","",20,119,110,null,"2026-08-19","https://www.instagram.com/reel/DcOb11HAbTP/",null,null]];
 
   var DATA = RAW.map(function (r) {
     return {
@@ -1341,7 +1341,7 @@
   // Analytics/Insights API (see the "📅 Monthly Views" Notion database and the
   // syncMonthlyViews_ family of functions in Code.gs) - NOT summed from shorts
   // posted that month. Shape: { yt: {"2026-07": 12345, ...}, fb: {...}, ig: {...}, tt: {...} }.
-  var MONTHLY_VIEWS = {"yt":{},"fb":{},"ig":{},"tt":{}};
+  var MONTHLY_VIEWS = {"yt":{"2026-08":0,"2026-07":0,"2026-06":0,"2026-05":0,"2026-04":0,"2026-03":0,"2026-02":0},"fb":{"2026-02":110023,"2026-03":214603,"2026-04":188552,"2026-05":83545,"2026-06":112920,"2026-08":37492,"2026-07":128384},"ig":{"2026-08":12486,"2026-07":37549,"2026-06":49033,"2026-05":30333,"2026-04":35228,"2026-03":45922,"2026-02":22027},"tt":{}};
 
   // Same real-API sourcing as MONTHLY_VIEWS, but per exact calendar day -
   // see src/dailyViews.js. Powers the "Total views" KPI tile for a custom
@@ -1350,7 +1350,7 @@
   // all. Coverage may be partial (a bounded recent window plus whatever a
   // one-time backfill has filled in) - callers must treat a day missing
   // from this map as "no real data," not "zero views."
-  var DAILY_VIEWS = {"yt":{},"fb":{},"ig":{}};
+  var DAILY_VIEWS = {"yt":{"2026-08-16":0,"2026-08-15":0,"2026-08-14":0,"2026-08-13":0,"2026-08-12":0,"2026-08-11":0,"2026-08-10":0,"2026-08-09":0,"2026-08-08":0,"2026-08-07":0,"2026-08-06":0,"2026-08-05":0,"2026-08-04":0,"2026-08-03":0,"2026-08-02":0,"2026-08-01":0,"2026-07-31":0,"2026-07-30":0,"2026-07-29":0,"2026-07-28":0,"2026-07-27":0,"2026-07-26":0,"2026-07-25":0,"2026-07-24":0,"2026-07-23":0,"2026-07-22":0,"2026-07-21":0,"2026-07-20":0,"2026-07-19":0,"2026-07-18":0,"2026-07-17":0,"2026-07-16":0,"2026-07-15":0},"fb":{"2026-07-19":7297,"2026-07-18":8283,"2026-07-17":6955,"2026-07-16":8895,"2026-07-15":8965,"2026-08-18":905,"2026-08-17":1770,"2026-08-16":2489,"2026-08-15":1574,"2026-08-14":1533,"2026-08-13":1584,"2026-08-12":2132,"2026-08-11":1892,"2026-08-10":1884,"2026-08-09":1924,"2026-08-08":2892,"2026-08-07":2376,"2026-08-06":2154,"2026-08-05":1979,"2026-08-04":1313,"2026-08-03":1859,"2026-08-02":2925,"2026-08-01":4307,"2026-07-31":4552,"2026-07-30":1456,"2026-07-29":1001,"2026-07-28":1645,"2026-07-27":1454,"2026-07-26":2688,"2026-07-25":2501,"2026-07-24":3262,"2026-07-23":3119,"2026-07-22":3443,"2026-07-21":5396,"2026-07-20":7552},"ig":{"2026-08-18":448,"2026-08-17":629,"2026-08-16":831,"2026-08-15":321,"2026-08-14":289,"2026-08-13":553,"2026-08-12":551,"2026-08-11":953,"2026-08-10":560,"2026-08-09":508,"2026-08-08":656,"2026-08-07":653,"2026-08-06":325,"2026-08-05":775,"2026-08-04":743,"2026-08-03":658,"2026-08-02":1175,"2026-08-01":1046,"2026-07-31":832,"2026-07-30":972,"2026-07-29":974,"2026-07-28":642,"2026-07-27":1305,"2026-07-26":967,"2026-07-25":675,"2026-07-24":594,"2026-07-23":965,"2026-07-22":1916,"2026-07-21":1139,"2026-07-20":1028,"2026-07-19":922,"2026-07-18":992,"2026-07-17":1041,"2026-07-16":1225,"2026-07-15":1605}};
 
   // One immutable snapshot per platform per day - see src/audience.js and
   // scripts/backfill-follower-history.js. Has a "tt" key (unlike
@@ -1358,7 +1358,7 @@
   // TikTok even though its view counts aren't - though TikTok has no
   // historical follower API, so its coverage only starts from whenever
   // daily tracking began, unlike YouTube/Facebook/Instagram's full history.
-  var FOLLOWER_SNAPSHOTS = {"yt":{},"fb":{},"ig":{},"tt":{}};
+  var FOLLOWER_SNAPSHOTS = {"yt":{"2026-08-19":1130},"fb":{"2026-08-19":10738},"ig":{"2026-08-19":4095},"tt":{"2026-08-19":1969}};
 
   var PLATFORMS = [
     { key: "yt", label: "YouTube",   color: "var(--p-yt)" },
