@@ -1526,7 +1526,9 @@
     latestPreset: "all", latestCustomFrom: null, latestCustomTo: null
   };
   var TABLE_DEFAULT_LIMIT = 5;
-  var PERF_DEFAULT_LIMIT = 3;
+  // On mobile the perf-grid is 2 columns, so 3 items leaves an odd one
+  // dangling on its own row - 4 fills both rows evenly.
+  var PERF_DEFAULT_LIMIT = (window.matchMedia && window.matchMedia("(max-width: 640px)").matches) ? 4 : 3;
   var MONTHLY_DEFAULT_LIMIT = 12;
 
   // { start, end } for a named preset key - end === null means "open,
