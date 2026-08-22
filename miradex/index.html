@@ -364,7 +364,12 @@
      breakdown/Channel benchmarks) - collapses to one column under the
      existing 860px mobile breakpoint, same as .kpi-grid. */
   .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
-  .card-row > .card { margin-bottom: 0; }
+  /* Grid items default to min-width:auto, so a card whose content has a
+     large min-content width (the benchmarks table's min-width:760px, the
+     month-list's minmax(225px,...) columns) would otherwise refuse to
+     shrink below that width - ballooning the card past its 1fr track and
+     dragging the whole page into horizontal overflow on mobile. */
+  .card-row > .card { margin-bottom: 0; min-width: 0; }
   @media (max-width: 860px) { .card-row { grid-template-columns: 1fr; } }
   /* Groups title+note so a header can also carry a "Show all" button
      without the button splitting away from the title via space-between. */
